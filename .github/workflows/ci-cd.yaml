@@ -19,6 +19,9 @@ jobs:
         run: |
           echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
           echo "::set-output name=date::$(date +%Y%m%d)"
+          echo "::set-output name=repository::${REPOSITORY,,}"
+        env:
+          REPOSITORY: '${{ github.repository }}'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.0.0
@@ -42,7 +45,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.sha_short }}
-            ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.date }}
+            ghcr.io/${{ steps.vars.outputs.repository }}:latest
+            ghcr.io/${{ steps.vars.outputs.repository }}:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/${{ steps.vars.outputs.repository }}:${{ steps.vars.outputs.date }}
           pull: true
