@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:bullseye
 
 ARG steam_user=anonymous
 ARG steam_password=
