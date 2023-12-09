@@ -1,11 +1,15 @@
-FROM debian:bullseye
+FROM debian:jessie
 
 ARG steam_user=anonymous
 ARG steam_password=
 ARG metamod_version=1.20
 ARG amxmod_version=1.8.2
 
-RUN apt update && apt install -y lib32gcc-s1 curl
+RUN echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/debian-archive\
+ && echo "deb [trusted=yes] http://archive.debian.org/debian jessie main" > /etc/apt/sources.list\
+ && echo "deb [trusted=yes] http://archive.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list
+
+RUN dpkg --add-architecture i386 && apt update && apt install -y lib32gcc1 libstdc++6:i386 curl
 
 # Install SteamCMD
 RUN mkdir -p /opt/steam && cd /opt/steam && \
@@ -56,6 +60,9 @@ ADD files/maps.ini /opt/hlds/cstrike/addons/amxmodx/configs/maps.ini
 
 # Cleanup
 RUN apt remove -y curl
+
+# Configure library path
+ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
 
 WORKDIR /opt/hlds
 
