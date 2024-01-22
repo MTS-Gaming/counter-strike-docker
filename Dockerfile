@@ -7,19 +7,12 @@ ARG amxmod_version=1.8.2
 
 RUN echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/debian-archive\
  && echo "deb [trusted=yes] http://archive.debian.org/debian jessie main" > /etc/apt/sources.list\
- && echo "deb [trusted=yes] http://archive.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list
-
-RUN dpkg --add-architecture i386 && apt update && apt install -y lib32gcc1 libstdc++6:i386 curl
-
-# Install SteamCMD
-RUN mkdir -p /opt/steam && cd /opt/steam && \
-    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
-
-# Install HLDS
-RUN mkdir -p /opt/hlds
-# Workaround for "app_update 90" bug, see https://forums.alliedmods.net/showthread.php?p=2518786 and https://forums.alliedmods.net/showthread.php?t=319117
-WORKDIR /opt/steam
-RUN /opt/steam/steamcmd.sh +force_install_dir /opt/hlds +login $steam_user $steam_password +app_update 90 validate +quit || :; \
+ && echo "deb [trusted=yes] http://archive.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list\
+ && dpkg --add-architecture i386 && apt update && apt install -y lib32gcc1 libstdc++6:i386 libcurl3:i386 curl\
+ && mkdir -p /opt/steam && cd /opt/steam\
+ && curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -\
+ && mkdir -p /opt/hlds\
+ && /opt/steam/steamcmd.sh +force_install_dir /opt/hlds +login $steam_user $steam_password +app_update 90 validate +quit || :; \
     /opt/steam/steamcmd.sh +force_install_dir /opt/hlds +login $steam_user $steam_password +app_update 70 validate +quit || :; \
     /opt/steam/steamcmd.sh +force_install_dir /opt/hlds +login $steam_user $steam_password +app_update 10 validate +quit || :; \
     /opt/steam/steamcmd.sh +force_install_dir /opt/hlds +login $steam_user $steam_password +app_update 90 validate +quit || :; \
